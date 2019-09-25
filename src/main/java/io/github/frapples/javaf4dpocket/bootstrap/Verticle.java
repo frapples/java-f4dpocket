@@ -28,10 +28,9 @@ public class Verticle extends AbstractVerticle {
     public void start(Future<Void> startFuture) {
         HttpServer server = vertx.createHttpServer();
         Router router = Router.router(vertx);
-
         controllers.forEach(c -> c.init(router));
 
-        server.requestHandler(router::accept).listen(getPort());
+        server.requestHandler(router).listen(getPort());
 
         workerService.init(vertx);
     }

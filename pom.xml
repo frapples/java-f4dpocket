@@ -55,7 +55,7 @@
     <maven-surefire-plugin.version>2.19</maven-surefire-plugin.version>
     <junit-platform-surefire-provider.version>1.0.1</junit-platform-surefire-provider.version>
     <assertj-core.version>3.8.0</assertj-core.version>
-    <vertx.version>3.5.3</vertx.version>
+    <vertx.version>3.8.1</vertx.version>
   </properties>
 
   <dependencyManagement>
@@ -159,4 +159,16 @@
      </dependency>
   </dependencies>
 
+  <repositories>
+    <repository>
+      <id>maven-ali</id>
+      <url>http://maven.aliyun.com/nexus/content/groups/public/</url>
+      <releases>
+        <enabled>true</enabled>
+      </releases>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
+    </repository>
+  </repositories>
 </project>
