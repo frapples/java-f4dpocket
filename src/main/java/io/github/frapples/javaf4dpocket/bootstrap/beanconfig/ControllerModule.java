@@ -1,9 +1,9 @@
-package io.github.frapples.javaf4dpocket.controller;
+package io.github.frapples.javaf4dpocket.bootstrap.beanconfig;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.multibindings.Multibinder;
-import io.github.frapples.javaf4dpocket.controller.base.BaseController;
-import io.github.frapples.javaf4dpocket.controller.hello.HelloController;
+import io.github.frapples.javaf4dpocket.comm.base.BaseController;
+import io.github.frapples.javaf4dpocket.bootstrap.controller.JsonrpcController;
 
 /**
  * @author Frapples <isfrapples@outlook.com>
@@ -14,6 +14,6 @@ public class ControllerModule extends AbstractModule {
     @Override
     public void configure() {
         Multibinder<BaseController> controllerBinder = Multibinder.newSetBinder(binder(), BaseController.class);
-        controllerBinder.addBinding().to(HelloController.class);
+        controllerBinder.addBinding().to(JsonrpcController.class);
     }
 }

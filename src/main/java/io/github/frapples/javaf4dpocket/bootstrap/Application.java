@@ -2,9 +2,13 @@ package io.github.frapples.javaf4dpocket.bootstrap;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
+import com.google.inject.Inject;
 import com.google.inject.Injector;
-import io.github.frapples.javaf4dpocket.controller.ControllerModule;
-import io.vertx.core.Vertx;
+import io.github.frapples.javaf4dpocket.comm.base.BaseController;
+import io.github.frapples.javaf4dpocket.bootstrap.beanconfig.ControllerModule;
+import io.github.frapples.javaf4dpocket.bootstrap.beanconfig.ServiceModule;
+import java.util.Set;
+import spark.Spark;
 
 /**
  * @author Frapples <isfrapples@outlook.com>
@@ -12,12 +16,30 @@ import io.vertx.core.Vertx;
  */
 public class Application {
 
-    public static void main(String[] args) {
-        Injector injector = Guice.createInjector(new AppModule(), new ControllerModule());
-        Verticle verticle = injector.getInstance(Verticle.class);
+    @Inject
+    private Set<BaseController> controllers;
 
-        Vertx vertx = Vertx.vertx();
-        vertx.deployVerticle(verticle);
+    public static void main(String[] args) {
+        Injector injector = Guice.createInjector(
+            new AppModule(),
+            new ControllerModule(),
+            new ServiceModule()
+        );
+        Application application = injector.getInstance(Application.class);
+        application.init();
+    }
+
+    public void init() {
+        Spark.port(getPort());
+        controllers.forEach(BaseController::bind);
+    }
+
+    private int getPort() {
+        try {
+            return Integer.parseInt(System.getProperty("port"));
+        } catch (Exception e) {
+            return 8080;
+        }
     }
 
     static class AppModule extends AbstractModule {
