@@ -32,8 +32,46 @@ const setting = {
     }
 };
 
+function getLocalStorage(key, defaultValue) {
+    let v = localStorage.getItem(key);
+    return _.isNil(v) ? defaultValue : JSON.parse(v);
+}
+
+function setLocalStorage(key, v) {
+    localStorage.setItem(key, JSON.stringify(v));
+}
+
+function getProjectList() {
+    let list = localStorage.getItem("f4dpocket/projectList");
+    return _.isNil(list) ? [] : JSON.parse(list);
+}
+
+
+const autocode = {
+
+    namespaced: true,
+    state: {
+        projects: getLocalStorage("f4dpocket/projectList", []),
+        authors: getLocalStorage("f4dpocket/authors", []),
+    },
+
+    mutations: {
+        setProjects(state, projects) {
+            setLocalStorage("f4dpocket/projectList", projects);
+            state.projects = projects;
+        },
+
+        setAuthors(state, authors) {
+            setLocalStorage("f4dpocket/authors", authors);
+            state.authors = authors;
+        }
+    }
+
+};
+
 window.globalModules.store = new Vuex.Store({
     modules: {
-        setting
+        setting,
+        autocode
     }
 });

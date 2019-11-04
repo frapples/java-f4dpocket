@@ -38,6 +38,6 @@ public class ResponseDTO {
     }
 
     public static ResponseDTO of(ErrcodeException e) {
-        return new ResponseDTO(e.getCode(), e.getMessage(), e.getDescription(), null);
+        return new ResponseDTO(e.getCode(), e.getMsg(), e.getDescription(), null);
     }
 }

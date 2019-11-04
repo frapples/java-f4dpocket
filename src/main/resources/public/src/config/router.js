@@ -2,6 +2,7 @@ const RouteView = httpVueLoader("./src/layouts/RouteView.vue");
 const MenuView = httpVueLoader("./src/layouts/MenuView.vue");
 const ExceptionPage = httpVueLoader("./src/pages/exception/ExceptionPage.vue");
 const ProjectConfig = httpVueLoader("./src/pages/webproject/ProjectConfig.vue");
+const MybatisGenerate = httpVueLoader("./src/pages/webproject/MybatisGenerate.vue");
 
 const Page404 = Vue.component('Page404', {
     components: { ExceptionPage },
@@ -31,7 +32,7 @@ window.globalModules.router = new VueRouter({
                         {
                             path: '/webproject/mybatis-generate',
                             name: 'mybatis代码生成',
-                            component: Page404,
+                            component: MybatisGenerate,
                             icon: 'none'
                         }
                     ]

@@ -11,21 +11,25 @@ import lombok.Getter;
 public class ErrcodeException extends RuntimeException {
 
     String code;
-    String message;
+    String msg;
     String description;
 
     public ErrcodeException(ErrorCode errorCode, String description) {
-        super(errorCode.getMessage());
+        super(errorCode.getMessage() + ": " + description);
         this.code = errorCode.getCode();
-        this.message = errorCode.getMessage();
+        this.msg = errorCode.getMessage();
         this.description = description;
     }
 
     public ErrcodeException(ErrorCode errorCode, String description, Throwable e) {
-        super(errorCode.getMessage(), e);
+        super(errorCode.getMessage() + ": " + description, e);
         this.code = errorCode.getCode();
-        this.message = errorCode.getMessage();
+        this.msg = errorCode.getMessage();
         this.description = description;
+    }
+
+    public static ErrcodeException error(String description) {
+        return new ErrcodeException(ErrorCode.ERROR, description);
     }
 
     public static ErrcodeException ofArgumentInvalid(String description) {

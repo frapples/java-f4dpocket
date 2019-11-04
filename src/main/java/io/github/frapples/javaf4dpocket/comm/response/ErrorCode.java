@@ -13,6 +13,7 @@ import lombok.Getter;
 public enum ErrorCode {
 
     SUCCESS("SUCCESS", "success"),
+    ERROR("ERROR", "error"),
     ARGUMENT_INVALID("ARGUMENT_INVALID", "argument invalid"),
     ;
 

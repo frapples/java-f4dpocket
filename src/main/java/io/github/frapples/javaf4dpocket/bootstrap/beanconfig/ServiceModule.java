@@ -4,6 +4,7 @@ import com.google.inject.AbstractModule;
 import com.google.inject.multibindings.Multibinder;
 import io.github.frapples.javaf4dpocket.comm.base.BaseService;
 import io.github.frapples.javaf4dpocket.service.hello.HelloService;
+import io.github.frapples.javaf4dpocket.service.project.ProjectService;
 
 /**
  * @author Frapples <isfrapples@outlook.com>
@@ -15,5 +16,6 @@ public class ServiceModule extends AbstractModule {
     public void configure() {
         Multibinder<BaseService> serviceBinder = Multibinder.newSetBinder(binder(), BaseService.class);
         serviceBinder.addBinding().to(HelloService.class);
+        serviceBinder.addBinding().to(ProjectService.class);
     }
 }

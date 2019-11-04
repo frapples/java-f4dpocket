@@ -4,9 +4,8 @@
         :columns="columns"
         :data-source="dataSource"
         :pagination="false"
-        :scroll="{ x: 1500 }"
     >
-      <template  v-for="(col, i) in ['code', 'path', 'desc', 'ipport', 'dbname', 'dbuser', 'dbpassword']" :slot="col" slot-scope="text, record, index">
+      <template  v-for="(col, i) in ['name', 'nickName', 'email']" :slot="col" slot-scope="text, record, index">
         <a-input
             :key="col"
             v-if="record.editable"
@@ -14,17 +13,6 @@
             :value="text"
             :placeholder="columns[i].title"
             @change="e => handleChange(e.target.value, record.key, col)"></a-input>
-        <template v-else>{{text}}</template>
-      </template>
-      <template slot="dbtype" slot-scope="text, record, index">
-        <a-select :value="text"
-                  v-if="record.editable"
-                  style="margin: -5px 0"
-                  @change="handleChange(arguments[0], record.key, 'dbtype')">
-          <a-select-option value="oracle">oracle</a-select-option>
-          <a-select-option value="mysql">mysql</a-select-option>
-          <a-select-option value="h2">h2</a-select-option>
-        </a-select>
         <template v-else>{{text}}</template>
       </template>
       <template slot="operation" slot-scope="text, record, index">
@@ -58,101 +46,39 @@
 <script>
   const columns = [
     {
-      title: '项目',
-      width: "5%",
-      dataIndex: 'code',
-      key: 'code',
-      scopedSlots: { customRender: 'code' }
+      title: '姓名',
+      dataIndex: 'name',
+      key: 'name',
+      scopedSlots: { customRender: 'name' }
     },
     {
 
-      title: '项目路径',
-      width: "10%",
-      dataIndex: 'path',
-      key: 'path',
-      scopedSlots: { customRender: 'path' }
+      title: '注释昵称',
+      dataIndex: 'nickName',
+      key: 'nickName',
+      scopedSlots: { customRender: 'nickName' }
     },
     {
-      title: '说明',
-      width: "8%",
-      dataIndex: 'desc',
-      key: 'desc',
-      scopedSlots: { customRender: 'desc' }
+      title: '注释邮箱',
+      dataIndex: 'email',
+      key: 'email',
+      scopedSlots: { customRender: 'email' }
     },
 
-    {
-      title: '数据库类型',
-      width: "5%",
-      dataIndex: 'dbtype',
-      key: 'dbtype',
-      scopedSlots: { customRender: 'dbtype' }
-    },
-
-    {
-      title: '地址和端口',
-      width: "8%",
-      dataIndex: 'ipport',
-      key: 'ipport',
-      scopedSlots: { customRender: 'ipport' }
-    },
-
-    {
-      title: '数据库名',
-      width: "8%",
-      dataIndex: 'dbname',
-      key: 'dbname',
-      scopedSlots: { customRender: 'dbname' }
-    },
-
-    {
-      title: '数据库用户',
-      width: "8%",
-      dataIndex: 'dbuser',
-      key: 'dbuser',
-      scopedSlots: { customRender: 'dbuser' }
-    },
-
-    {
-      title: '数据库密码',
-      width: "8%",
-      dataIndex: 'dbpassword',
-      key: 'dbpassword',
-      scopedSlots: { customRender: 'dbpassword' }
-    },
     {
       title: '操作',
-      width: "10%",
       key: 'action',
-      //fixed: 'right',
       scopedSlots: { customRender: 'operation' }
     }
+
   ];
-
-  const dataSource = [
-    {
-      key: 1,
-      editable: false,
-      id: 'wms',
-      path: 'D:\\ams',
-      desc: '供应商管理项目',
-    },
-    {
-      key: 2,
-      editable: false,
-      id: 'ams',
-      path: 'D:\\ams',
-      desc: '供应商管理项目',
-    }
-  ];
-
-
 
   module.exports = {
-    name: 'TableForm',
+    name: 'AuthorTable',
     data () {
       return {
-        columns,
-        dataSource
+        columns: columns,
+        dataSource: this.$store.state.autocode.authors,
       }
     },
     methods: {
@@ -160,23 +86,26 @@
         e.preventDefault()
       },
       newMeber () {
+        let max = _.maxBy(this.dataSource, it => it.key);
         this.dataSource.push({
-          key: '99',
-          id: '',
-          path: '',
-          desc: '',
+          key: _.isNil(max) ? 1 : max.key + 1,
+          name: '',
+          nickName: '',
+          email: '',
           editable: true,
           isNew: true
         })
       },
       remove (key) {
         const newData = this.dataSource.filter(item => item.key !== key)
-        this.dataSource = newData
+        this.dataSource = newData;
+        this.$store.commit("autocode/setAuthors", this.dataSource);
       },
       saveRow (key) {
         let target = this.dataSource.filter(item => item.key === key)[0]
         target.editable = false
         target.isNew = false
+        this.$store.commit("autocode/setAuthors", this.dataSource);
       },
       toggle (key) {
         let target = this.dataSource.filter(item => item.key === key)[0]
@@ -197,7 +126,7 @@
           target[column] = value
           this.dataSource = newData
         }
-      }
+      },
     }
   }
 </script>

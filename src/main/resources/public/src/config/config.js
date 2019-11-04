@@ -24,6 +24,27 @@ Vue.use(function (Vue) {
     Vue.prototype.$bus = new Vue();
 });
 
+
+function httpWithJsonRpc(serviceName, data) {
+    return axios.post("/api/json-rpc", {
+        "jsonrpc": "2.0",
+        "method": serviceName,
+        "params": data,
+        "id": uuidv4()
+    }).then(function (response) {
+        if (response.data.error) {
+            antd.notification.error({
+                message: 'API调用错误',
+                description: JSON.stringify(response.data.error),
+                duration: null
+            });
+            return Promise.reject(response.data);
+        } else {
+            return Promise.resolve(response.data);
+        }
+    });
+}
+
 /****  axios 配置 ****/
 axios.interceptors.request.use(function (config) {
     return config;
@@ -34,10 +55,11 @@ axios.interceptors.request.use(function (config) {
 axios.interceptors.response.use(function (response) {
     // console.log(response);
     const data = response.data;
-    if (!data.successed) {
+    if (false) {
         antd.notification.error({
             message: 'API调用错误',
-            description: JSON.stringify(error)
+            description: JSON.stringify(error),
+            duration: null
         });
         return Promise.reject(data);
     } else {
@@ -46,7 +68,8 @@ axios.interceptors.response.use(function (response) {
 }, function (error) {
     antd.notification.error({
         message: '网络错误',
-        description: JSON.stringify(error)
+        description: JSON.stringify(error),
+        duration: null
     });
     // Do something with response error
     return Promise.reject(error);

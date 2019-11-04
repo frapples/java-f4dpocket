@@ -5,6 +5,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.inject.Inject;
 import io.github.frapples.javaf4dpocket.comm.base.BaseController;
 import io.github.frapples.javaf4dpocket.comm.base.BaseService;
+import io.github.frapples.javaf4dpocket.comm.utils.JacksonUtils;
 import io.github.frapples.javaf4dpocket.comm.utils.JsonRpcDispatcher;
 import java.io.File;
 import java.io.FileInputStream;
@@ -16,6 +17,7 @@ import javax.servlet.ServletOutputStream;
 import lombok.SneakyThrows;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import spark.Request;
 import spark.Response;
 import spark.Spark;
@@ -26,7 +28,7 @@ import spark.Spark;
  */
 public class HttpController extends BaseController {
 
-    private ObjectMapper objectMapper = new ObjectMapper();
+    private ObjectMapper objectMapper = JacksonUtils.jacksonObjectMapperWithPretty();
 
     private JsonRpcDispatcher jsonRpcDispatcher = new JsonRpcDispatcher(objectMapper);
 
@@ -45,7 +47,8 @@ public class HttpController extends BaseController {
         });
     }
 
-    private Object jsonRpc(Request request, Response response) {
+    private Object jsonRpc(Request request, Response response) throws InterruptedException {
+        Thread.sleep(1000);
         return jsonRpcDispatcher.handle(request.body());
     }
 
@@ -63,7 +66,7 @@ public class HttpController extends BaseController {
     private InputStream readStaticFile(String path) {
         final boolean DEBUG = true;
         if (DEBUG) {
-            String resourceDir = "D:\\project\\javaf4dpocket\\src\\main\\resources";
+            String resourceDir = "E:\\project\\java-f4dpocket\\src\\main\\resources";
             return new FileInputStream(new File(resourceDir + path));
         } else {
             return getClass().getResourceAsStream(path);

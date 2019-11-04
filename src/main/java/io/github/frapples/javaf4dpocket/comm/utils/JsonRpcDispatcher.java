@@ -1,5 +1,7 @@
 package io.github.frapples.javaf4dpocket.comm.utils;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
+import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -27,7 +29,9 @@ public class JsonRpcDispatcher {
 
     public JsonRpcDispatcher(ObjectMapper objectMapper) {
         this.objectMapper = objectMapper;
-        this.jsonRpcServer = JsonRpcServer.withMapper(objectMapper);
+        this.jsonRpcServer = JsonRpcServer.withMapper(objectMapper.copy()
+            .setVisibility(PropertyAccessor.CREATOR, Visibility.ANY)
+        );
     }
 
     public void addService(String beanName, Object service) {
