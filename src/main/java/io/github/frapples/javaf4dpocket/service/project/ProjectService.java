@@ -11,7 +11,7 @@ import io.github.frapples.javaf4dpocket.comm.utils.PathUtils;
 import io.github.frapples.javaf4dpocket.db.metadatabase.model.DatabaseConfig;
 import io.github.frapples.javaf4dpocket.db.metadatabase.model.TableEntity;
 import io.github.frapples.javaf4dpocket.db.metadatabase.service.MetaDatabaseService;
-import io.github.frapples.javaf4dpocket.parser.SimpleJavaProjectParser;
+import io.github.frapples.javaf4dpocket.parser.JavaProjectParser;
 import io.github.frapples.javaf4dpocket.service.project.model.ProjectConfig;
 import java.io.File;
 import java.io.IOException;
@@ -84,14 +84,14 @@ public class ProjectService extends BaseService {
 
     @JsonRpcMethod
     public Set<String> allTopJavaClassFullNames(@JsonRpcParam("path") String directory) {
-        SimpleJavaProjectParser parser = SimpleJavaProjectParser.of(directory);
+        JavaProjectParser parser = JavaProjectParser.of(directory);
         parser.parse();
         return parser.getJavaClassNames();
     }
 
     @JsonRpcMethod
     public Set<String> allPackageNames(@JsonRpcParam("path") String directory) {
-        SimpleJavaProjectParser parser = SimpleJavaProjectParser.of(directory);
+        JavaProjectParser parser = JavaProjectParser.of(directory);
         parser.parse();
         return parser.getPackageNames();
     }

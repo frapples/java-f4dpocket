@@ -27,7 +27,8 @@ public class Freemarkders {
         cfg.setDefaultEncoding("UTF-8");
         cfg.setTemplateUpdateDelay(0);
         cfg.setObjectWrapper(new DefaultObjectWrapper());
-        cfg.setDirectoryForTemplateLoading(new File("."));
+        cfg.setClassForTemplateLoading(Freemarkders.class, "/");
+        //cfg.setDirectoryForTemplateLoading(new File("."));
         return cfg;
     }
 

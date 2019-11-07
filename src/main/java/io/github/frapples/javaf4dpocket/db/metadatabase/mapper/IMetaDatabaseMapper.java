@@ -16,7 +16,7 @@ import org.apache.ibatis.annotations.Select;
 public interface IMetaDatabaseMapper {
 
     @Select("select table_comment from information_schema.tables"
-        + " where table_schema = #{schemaName} AND table_name = #{tableName}")
+            + " where table_schema = #{schemaName} AND table_name = #{tableName}")
     String getComment(@Param("schemaName") String schemaName, @Param("tableName") String tableName);
 
     @Select("select column_name, data_type, column_comment, column_type" + " from information_schema.columns"

@@ -1,0 +1,13 @@
+@host = 127.0.0.1:8080/api/json-rpc
+
+POST http://{{host}}
+Content-Type: application/json
+
+{
+    "id": 1,
+    "jsonrpc": "2.0",
+    "method": "project.getProjectConfig", 
+    "params": {
+        "path": "D:\\test"
+    }
+}

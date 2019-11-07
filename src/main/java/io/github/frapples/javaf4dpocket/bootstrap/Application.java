@@ -19,8 +19,14 @@ public class Application {
     @Inject
     private Set<BaseController> controllers;
 
+    private static Injector injector;
+
+    public static <T> T getBean(Class<T> clazz) {
+        return injector.getInstance(clazz);
+    }
+
     public static void main(String[] args) {
-        Injector injector = Guice.createInjector(
+        injector = Guice.createInjector(
             new AppModule(),
             new ControllerModule(),
             new ServiceModule()
