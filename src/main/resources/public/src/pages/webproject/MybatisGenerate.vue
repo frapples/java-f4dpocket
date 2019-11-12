@@ -10,12 +10,23 @@
                     </a-select-option>
                 </a-select>
             </a-form-item>
+            <a-form-item label="作者" :label-col="{ span: 2 }" :wrapper-col="{ span: 10 }">
+                <a-select :default-value="projectList.length > 0 ? 0 : null"
+                          v-model="authorIndex"
+                >
+                    <a-select-option v-for="(author, index) in authors"
+                                     :key="index" :value="index">
+                        <span style="margin-right: 20px"> {{author.name}} </span>
+                        <span style="color: #9ea7b4; font-size: 12px; float: right">{{author.nickName}} <{{ author.email }}></span>
+                    </a-select-option>
+                </a-select>
+            </a-form-item>
         </div>
         <a-card class="card"  :bordered="false">
             <div slot="title">
                 <span>已有文件</span>
                 <a-button type="link" @click="$refs.projectFilesTable.detect()">探测</a-button>
-                <project-files ref="projectFilesTable" :project-index="projectIndex"></project-files>
+                <project-files ref="projectFilesTable" :project-index="projectIndex" :author-index="authorIndex"></project-files>
             </div>
         </a-card>
         <a-card class="card" title="代码生成" :bordered="false">
@@ -48,19 +59,6 @@
                 </a-row>
 
                 <a-row :gutter="24" class="form-row" type="flex" justify="start">
-                    <a-col :span="8" >
-                        <a-form-item label="作者" :label-col="{ span: 5 }" :wrapper-col="{ span: 17 }">
-                            <a-select :default-value="projectList.length > 0 ? 0 : null"
-                                      v-decorator="['authorIndex']"
-                            >
-                                <a-select-option v-for="(author, index) in authors"
-                                                 :key="index" :value="index">
-                                    <span style="margin-right: 20px"> {{author.name}} </span>
-                                    <span style="color: #9ea7b4; font-size: 12px; float: right">{{author.nickName}} <{{ author.email }}></span>
-                                </a-select-option>
-                            </a-select>
-                        </a-form-item>
-                    </a-col>
                     <a-col :span="16" >
                         <a-form-item label="实体名" :label-col="{ span: 2 }" :wrapper-col="{ span: 10 }">
                             <div style="display: flex">
@@ -169,6 +167,7 @@
                 form: this.$form.createForm(this, { name: 'coordinated' }),
                 tableLoading: false,
                 projectIndex: 0,
+                authorIndex: 0,
                 tables: [],
                 allPackageNames: [],
                 moduleSwitch: {
@@ -251,7 +250,7 @@
                         const data = {
                             moduleName: values.moduleName,
                             project: this.projectList[this.projectIndex],
-                            author: this.authors[values.authorIndex],
+                            author: this.authors[this.authorIndex],
                             table: this.tables[values.tableIndex],
                             modules: {
                                 entity: values.entity,

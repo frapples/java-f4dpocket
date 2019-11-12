@@ -9,7 +9,7 @@
         </template>
 
         <template slot="operation" slot-scope="text, record, index">
-            <a-popconfirm title="是否要重新生成此文件？" >
+            <a-popconfirm title="是否要重新生成此文件？" @confirm="regenerate(index)">
                 <a>更新</a>
             </a-popconfirm>
         </template>
@@ -39,7 +39,7 @@
 
     ];
     module.exports = {
-        props: ["projectIndex"],
+        props: ["projectIndex", "authorIndex"],
         name: 'ProjectFiles',
         data() {
             return {
@@ -59,6 +59,10 @@
 
             projectList() {
                 return this.$store.state.autocode.projects;
+            },
+
+            authorList() {
+                return this.$store.state.autocode.authors;
             },
 
         },
@@ -81,6 +85,18 @@
                     });
                     this.loading = false;
                 });
+            },
+
+            regenerate(index) {
+                const module = this.data[index];
+                httpWithJsonRpc("generator.regenerate", {
+                    config: {
+                        project: this.projectList[this.projectIndex],
+                        author: this.authorList[this.authorIndex],
+                        module: this.data[index]
+                    }
+                });
+                console.log(module);
             }
         }
     };

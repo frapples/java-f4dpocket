@@ -12,6 +12,7 @@ import io.github.frapples.javaf4dpocket.parser.model.DetectBaseVo;
 import io.github.frapples.javaf4dpocket.parser.model.ModuleEntity;
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Frapples <isfrapples@outlook.com>
@@ -32,5 +33,10 @@ public class GeneratorService extends BaseService {
     @JsonRpcMethod
     public List<DetectBaseVo> detectAllModules(@JsonRpcParam("path") String path) {
         return webProjectGenerator.detect(path);
+    }
+
+    @JsonRpcMethod
+    public void regenerate(@JsonRpcParam("config") Map<String, Object> moduleEntity) {
+        System.out.println(moduleEntity);
     }
 }

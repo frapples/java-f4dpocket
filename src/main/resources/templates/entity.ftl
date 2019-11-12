@@ -23,10 +23,11 @@ import lombok.ToString;
 @ToString(callSuper = true)
 public class ${entity.className} {
 <#list entity.fields! as v>
+
     /**
      * ${v.columnComment}
      */
     private ${v.javaType} ${v.javaColumnName};
-
 </#list>
+
 }
