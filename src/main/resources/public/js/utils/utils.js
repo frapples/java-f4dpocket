@@ -114,3 +114,11 @@ function uuidv4() {
         return v.toString(16);
     });
 }
+function basename(str) {
+    var idx = str.lastIndexOf('/');
+    idx = idx > -1 ? idx : str.lastIndexOf('\\');
+    if (idx < 0) {
+        return str
+    }
+    return str.substring(idx + 1);
+}

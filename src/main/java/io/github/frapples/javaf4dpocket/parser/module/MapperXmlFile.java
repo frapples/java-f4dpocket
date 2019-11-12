@@ -22,7 +22,6 @@ import java.io.OutputStream;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import lombok.Data;
@@ -91,14 +90,11 @@ public class MapperXmlFile implements IGeneratedFile<MapperCustomEntity> {
     }
 
     @Data
-    @Accessors(chain = true)
     public static class MapperDetectVo extends DetectBaseVo {
 
         private String mapperInterfaceClassName;
 
         private String mapperInterfacePath;
-
-        private String mapperPath;
 
         private String dbTableName;
     }
@@ -124,7 +120,7 @@ public class MapperXmlFile implements IGeneratedFile<MapperCustomEntity> {
                 if (m.matches()) {
                     find = true;
                     mapperDetectVo.mapperInterfaceClassName = m.group(1);
-                    mapperDetectVo.mapperPath = file.getPath();
+                    mapperDetectVo.setPath(file.getPath());
 
                     String nextLine = it.peek();
                     Pattern patternComment = Pattern.compile(".*<!--\\s*table: ([a-zA-Z-_]+)\\s*-->.*");

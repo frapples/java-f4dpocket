@@ -2,11 +2,15 @@ package io.github.frapples.javaf4dpocket.parser;
 
 import com.google.common.base.Charsets;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Streams;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import io.github.frapples.javaf4dpocket.comm.response.ErrcodeException;
+import io.github.frapples.javaf4dpocket.comm.utils.Files;
+import io.github.frapples.javaf4dpocket.comm.utils.PathUtils;
 import io.github.frapples.javaf4dpocket.parser.model.DetectBaseVo;
+import io.github.frapples.javaf4dpocket.parser.model.MapperCustomEntity;
 import io.github.frapples.javaf4dpocket.parser.model.ModuleEntity;
 import io.github.frapples.javaf4dpocket.parser.module.EntityFile;
 import io.github.frapples.javaf4dpocket.parser.module.IGeneratedFile;
@@ -15,6 +19,7 @@ import io.github.frapples.javaf4dpocket.parser.module.MapperXmlFile;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
@@ -23,6 +28,8 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 import lombok.SneakyThrows;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.jetbrains.annotations.Nullable;
 import org.jooq.lambda.Unchecked;
@@ -55,25 +62,38 @@ public class WebProjectGenerator {
             throw ErrcodeException.error(String.format("%s不存在或不是目录", rootPath));
         }
 
+        ImmutableMap.Builder<String, Object> modelBuilder = ImmutableMap.<String, Object>builder()
+            .put("tableName", moduleEntity.getTable().getTableName())
+            .put("comment", moduleEntity.getTable().getTableComment())
+            .put("author", moduleEntity.authorComment())
+            .put("date", DateFormatUtils.format(new Date(), "yyyy-MM-dd"));
+        for (IGeneratedFile generatedFile : getGeneratedFiles()) {
+
+            Object customConfig = null;
+            if (generatedFile instanceof MapperXmlFile) {
+                customConfig = new MapperCustomEntity();
+            }
+            Map<String, Object> m = generatedFile.prepare(moduleEntity, customConfig);
+            modelBuilder.putAll(m);
+        }
+        Map<String, Object> model = modelBuilder.build();
+
         for (IGeneratedFile<?> generatedFile : getGeneratedFiles()) {
-            Map<String, Object> model = generatedFile.prepare(moduleEntity, null);
-            Map<String, Object> m = ImmutableMap.<String, Object>builder()
-                .putAll(model)
-                .put("comment", moduleEntity.getTable().getTableComment())
-                .put("author", moduleEntity.authorComment())
-                .put("date", DateFormatUtils.format(new Date(), "yyyy-MM-dd"))
-                .build();
-            generatedFile.generate(moduleEntity, null, m);
+            generatedFile.generate(moduleEntity, null, model);
         }
     }
 
     public List<DetectBaseVo> detect(String root) {
         JavaProjectParser parser = JavaProjectParser.of(root);
-        Iterator<File> allJavaFiles = FileUtils.iterateFiles(new File(root), new String[]{"java", "xml"}, true);
+        Iterator<File> allJavaFiles = Files.iterateFiles(new File(root),
+            (file) -> Arrays.asList("java", "xml").contains(FilenameUtils.getExtension(file.getName()).toLowerCase()),
+            (dir) -> !dir.getName().startsWith(".")
+        );
         return Streams.stream(allJavaFiles)
             .filter(file -> file.length() < 10 * 1024 * 1024)
             .map(Unchecked.function((file) -> doDetect(file, parser)))
             .filter(Objects::nonNull)
+            .sorted(Comparator.comparing(vo -> PathUtils.basename(vo.getPath())))
             .collect(Collectors.toCollection(ArrayList::new));
     }
 
@@ -82,9 +102,10 @@ public class WebProjectGenerator {
     private DetectBaseVo doDetect(File file, JavaProjectParser parser) {
         String path = file.getCanonicalPath();
         String context = FileUtils.readFileToString(file, Charsets.UTF_8);
-        for (IGeneratedFile<?> generatedFile : getGeneratedFiles()) {
-            return generatedFile.detect(parser, path, context);
-        }
-        return null;
+        return getGeneratedFiles().stream()
+            .map(generatedFile -> generatedFile.detect(parser, path, context))
+            .filter(Objects::nonNull)
+            .findFirst()
+            .orElse(null);
     }
 }

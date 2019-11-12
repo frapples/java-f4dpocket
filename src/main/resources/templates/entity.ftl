@@ -15,7 +15,9 @@ import lombok.ToString;
  *
  * @author ${author}
  * @date ${date}
- */
+ *
+ * table: ${tableName}
+*/
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)

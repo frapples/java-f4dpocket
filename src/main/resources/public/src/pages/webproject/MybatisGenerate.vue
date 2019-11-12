@@ -13,7 +13,7 @@
         </div>
         <a-card class="card"  :bordered="false">
             <div slot="title">
-                <span>已有模块</span>
+                <span>已有文件</span>
                 <a-button type="link" @click="$refs.projectFilesTable.detect()">探测</a-button>
                 <project-files ref="projectFilesTable" :project-index="projectIndex"></project-files>
             </div>

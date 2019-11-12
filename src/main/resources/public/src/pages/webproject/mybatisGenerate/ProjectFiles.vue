@@ -1,6 +1,12 @@
 <template>
-    <a-table :columns="columns" :data-source="data" :loading="loading">
-
+    <a-table :pagination="false" :columns="columns" :data-source="data" :loading="loading">
+        <template slot="file" slot-scope="text, record, index">
+            <a-popover trigger="hover"
+                :title="null" >
+                <span slot="content"> {{record.path }}</span>
+                {{ record.filename }}
+            </a-popover>
+        </template>
 
         <template slot="operation" slot-scope="text, record, index">
             <a-popconfirm title="是否要重新生成此文件？" >
@@ -15,8 +21,8 @@
     const columns = [
         {
             title: '文件',
-            dataIndex: 'name',
-            key: 'name',
+            key: 'file',
+            scopedSlots: { customRender: 'file' }
         },
         {
 
@@ -43,6 +49,12 @@
             }
         },
 
+        watch: {
+            projectIndex(newV, oldV) {
+                this.data = [];
+            }
+        },
+
         computed: {
 
             projectList() {
@@ -63,7 +75,10 @@
                     path: project.path
                 })
                 .then((response) => {
-                    this.data = response.result;
+                    this.data = response.result.map(item => {
+                        item.filename = basename(item.path);
+                        return item;
+                    });
                     this.loading = false;
                 });
             }
