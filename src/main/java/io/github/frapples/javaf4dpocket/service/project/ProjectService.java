@@ -1,10 +1,8 @@
 package io.github.frapples.javaf4dpocket.service.project;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.arteam.simplejsonrpc.core.annotation.JsonRpcMethod;
-import com.github.arteam.simplejsonrpc.core.annotation.JsonRpcParam;
-import com.github.arteam.simplejsonrpc.core.annotation.JsonRpcService;
 import com.google.common.base.Charsets;
+import com.googlecode.jsonrpc4j.JsonRpcParam;
 import io.github.frapples.javaf4dpocket.comm.base.BaseService;
 import io.github.frapples.javaf4dpocket.comm.utils.JacksonUtils;
 import io.github.frapples.javaf4dpocket.comm.utils.PathUtils;
@@ -28,7 +26,6 @@ import org.apache.commons.io.FileUtils;
  * @author Frapples <isfrapples@outlook.com>
  * @date 2019/9/26
  */
-@JsonRpcService
 public class ProjectService extends BaseService {
 
     private final String CONFIG_FILE_NAME = "f4dpocket-project.json";
@@ -37,24 +34,20 @@ public class ProjectService extends BaseService {
     private MetaDatabaseService metaDatabaseService;
     private ObjectMapper objectMapper = JacksonUtils.jacksonObjectMapperWithPretty();
 
-    @JsonRpcMethod
     public ProjectConfig getProjectConfig(@JsonRpcParam("path") String directory) throws IOException {
         return readConfig(directory);
     }
 
-    @JsonRpcMethod
     public void updateProjectConfig(@JsonRpcParam("path") String directory, @JsonRpcParam("database") DatabaseConfig databaseConfig) throws IOException {
         ProjectConfig config = readConfig(directory);
         config.setDatabase(databaseConfig);
         writeConfig(directory, config);
     }
 
-    @JsonRpcMethod
     public void generateCode(@JsonRpcParam("path") String directory) throws IOException {
         ProjectConfig config = readConfig(directory);
     }
 
-    @JsonRpcMethod
     public Object testDatabaseConnection(@JsonRpcParam("path") String directory) throws IOException {
         ProjectConfig projectConfig = readConfig(directory);
 
@@ -75,21 +68,18 @@ public class ProjectService extends BaseService {
         return vo;
     }
 
-    @JsonRpcMethod
     public List<TableEntity> getDatabaseTables(@JsonRpcParam("path") String directory) throws IOException {
         ProjectConfig projectConfig = readConfig(directory);
         List<TableEntity> tables = metaDatabaseService.getTables(projectConfig.getDatabase());
         return tables.stream().sorted(Comparator.comparing(TableEntity::getTableName)).collect(Collectors.toList());
     }
 
-    @JsonRpcMethod
     public Set<String> allTopJavaClassFullNames(@JsonRpcParam("path") String directory) {
         JavaProjectParser parser = JavaProjectParser.of(directory);
         parser.parse();
         return parser.getJavaClassNames();
     }
 
-    @JsonRpcMethod
     public Set<String> allPackageNames(@JsonRpcParam("path") String directory) {
         JavaProjectParser parser = JavaProjectParser.of(directory);
         parser.parse();
