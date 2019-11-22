@@ -2,7 +2,6 @@ package io.github.frapples.javaf4dpocket.parser;
 
 import com.google.common.base.Charsets;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Streams;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -12,9 +11,7 @@ import io.github.frapples.javaf4dpocket.comm.utils.PathUtils;
 import io.github.frapples.javaf4dpocket.parser.model.DetectBaseVo;
 import io.github.frapples.javaf4dpocket.parser.model.MapperCustomEntity;
 import io.github.frapples.javaf4dpocket.parser.model.ModuleEntity;
-import io.github.frapples.javaf4dpocket.parser.module.EntityFile;
 import io.github.frapples.javaf4dpocket.parser.module.IGeneratedFile;
-import io.github.frapples.javaf4dpocket.parser.module.MapperInterfaceFile;
 import io.github.frapples.javaf4dpocket.parser.module.MapperXmlFile;
 import java.io.File;
 import java.util.ArrayList;
@@ -25,11 +22,13 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
+import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.SneakyThrows;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.jetbrains.annotations.Nullable;
 import org.jooq.lambda.Unchecked;
@@ -42,19 +41,8 @@ import org.jooq.lambda.Unchecked;
 public class WebProjectGenerator {
 
     @Inject
-    private EntityFile entityFile;
-
-    @Inject
-    private MapperInterfaceFile mapperInterfaceFile;
-
-    @Inject
-    private MapperXmlFile mapperXmlFile;
-
-
-    private List<IGeneratedFile> getGeneratedFiles() {
-        return Arrays.asList(entityFile,mapperInterfaceFile, mapperXmlFile);
-    }
-
+    @Getter(AccessLevel.PRIVATE)
+    Set<IGeneratedFile> generatedFiles;
 
     public void generate(ModuleEntity moduleEntity) {
         String rootPath = moduleEntity.getProject().getPath();

@@ -3,6 +3,7 @@ package io.github.frapples.javaf4dpocket.bootstrap.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
 import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import io.github.frapples.javaf4dpocket.comm.base.BaseController;
 import io.github.frapples.javaf4dpocket.comm.base.BaseService;
 import io.github.frapples.javaf4dpocket.comm.utils.JacksonUtils;
@@ -26,6 +27,7 @@ import spark.Spark;
  * @author Frapples <isfrapples@outlook.com>
  * @date 2019/9/25
  */
+@Singleton
 public class HttpController extends BaseController {
 
     private ObjectMapper objectMapper = JacksonUtils.jacksonObjectMapperWithPretty();

@@ -1,12 +1,13 @@
 package io.github.frapples.javaf4dpocket.bootstrap;
 
-import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
+import com.google.inject.Singleton;
+import com.google.inject.name.Named;
 import io.github.frapples.javaf4dpocket.comm.base.BaseController;
-import io.github.frapples.javaf4dpocket.bootstrap.beanconfig.ControllerModule;
-import io.github.frapples.javaf4dpocket.bootstrap.beanconfig.ServiceModule;
+import io.github.frapples.javaf4dpocket.comm.utils.guice.ComponentScanModule;
+import io.github.frapples.javaf4dpocket.comm.utils.guice.ConfigureFileModule;
 import java.util.Set;
 import spark.Spark;
 
@@ -19,6 +20,10 @@ public class Application {
     @Inject
     private Set<BaseController> controllers;
 
+    @Named("server.port")
+    @Inject
+    private int port;
+
     private static Injector injector;
 
     public static <T> T getBean(Class<T> clazz) {
@@ -27,31 +32,14 @@ public class Application {
 
     public static void main(String[] args) {
         injector = Guice.createInjector(
-            new AppModule(),
-            new ControllerModule(),
-            new ServiceModule()
-        );
+            new ComponentScanModule("io.github.frapples", Singleton.class, javax.inject.Singleton.class),
+            new ConfigureFileModule());
         Application application = injector.getInstance(Application.class);
-        application.init();
+        application.start();
     }
 
-    public void init() {
-        Spark.port(getPort());
+    private void start() {
+        Spark.port(port);
         controllers.forEach(BaseController::bind);
-    }
-
-    private int getPort() {
-        try {
-            return Integer.parseInt(System.getProperty("port"));
-        } catch (Exception e) {
-            return 8080;
-        }
-    }
-
-    static class AppModule extends AbstractModule {
-
-        @Override
-        public void configure() {
-        }
     }
 }

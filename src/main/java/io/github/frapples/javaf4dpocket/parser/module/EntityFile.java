@@ -6,7 +6,6 @@ import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableMap;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import com.google.inject.internal.cglib.proxy.$Factory;
 import io.github.frapples.javaf4dpocket.comm.utils.Beans;
 import io.github.frapples.javaf4dpocket.comm.utils.Freemarkders;
 import io.github.frapples.javaf4dpocket.comm.utils.PathUtils;
@@ -18,9 +17,7 @@ import io.github.frapples.javaf4dpocket.parser.model.DetectBaseVo;
 import io.github.frapples.javaf4dpocket.parser.model.ModuleConfigEntity;
 import io.github.frapples.javaf4dpocket.parser.model.ModuleEntity;
 import io.github.frapples.javaf4dpocket.parser.model.ProjectColumnEntity;
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.StringReader;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -31,7 +28,6 @@ import java.util.stream.Collectors;
 import lombok.SneakyThrows;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.lang3.StringUtils;
 
 /**
  * @author Frapples <isfrapples@outlook.com>
