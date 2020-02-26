@@ -11,6 +11,8 @@ public class DesktopApplication {
 
 
     public static void main(String[] args) {
+
+        log.info("jdk版本：{}", System.getProperty("java.version"));
         int port = NetUtils.findAvailablePort(8080, 8080, 9000);
         String serverUrl = "http://127.0.0.1:" + port;
         log.info(serverUrl);
