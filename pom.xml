@@ -40,7 +40,7 @@
           <!-- MainClass in mainfest make a executable jar -->
           <archive>
             <manifest>
-              <mainClass>io.github.frapples.javaf4dpocket.bootstrap.Application</mainClass>
+              <mainClass>io.github.frapples.javaf4dpocket.bootstrap.DesktopApplication</mainClass>
             </manifest>
           </archive>
 

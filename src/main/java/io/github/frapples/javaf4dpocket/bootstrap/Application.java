@@ -3,7 +3,6 @@ package io.github.frapples.javaf4dpocket.bootstrap;
 import com.google.inject.Guice;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
-import com.google.inject.Key;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 import io.github.frapples.javaf4dpocket.comm.base.BaseController;
@@ -21,6 +20,10 @@ public class Application {
     @Inject
     private Set<BaseController> controllers;
 
+    @Named("server.listening-address")
+    @Inject
+    private String listeningAddress;
+
     @Named("server.default-port")
     @Inject
     private int port;
@@ -31,23 +34,30 @@ public class Application {
         return injector.getInstance(clazz);
     }
 
-    public static void run(Integer port) {
+    public static void runAndAwaitInit(Integer port) {
         injector = Guice.createInjector(
             new ComponentScanModule("io.github.frapples", Singleton.class, javax.inject.Singleton.class),
             new ConfigureFileModule());
         Application application = injector.getInstance(Application.class);
-        application.start(port);
+        application.startAndAwaitInit(port);
     }
 
     public static void main(String[] args) {
-        run(null);
+        runAndAwaitInit(null);
     }
 
-    private void start(Integer port) {
+    public static void stop() {
+        Spark.stop();
+    }
+
+    private void startAndAwaitInit(Integer port) {
         if (port == null) {
             port = this.port;
         }
         Spark.port(port);
+        Spark.ipAddress(listeningAddress);
+        Spark.threadPool(4, 2, 10 * 1000);
         controllers.forEach(BaseController::bind);
+        Spark.awaitInitialization();
     }
 }

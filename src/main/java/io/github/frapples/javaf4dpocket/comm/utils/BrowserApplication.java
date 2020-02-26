@@ -18,6 +18,8 @@ import javafx.stage.WindowEvent;
 import jfxtras.styles.jmetro.JMetro;
 import jfxtras.styles.jmetro.Style;
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
 
@@ -27,6 +29,8 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 public class BrowserApplication extends Application {
+
+    private MyBrowser myBrowser;
 
     @Data
     @Accessors(chain = true)
@@ -57,12 +61,11 @@ public class BrowserApplication extends Application {
         private StageStyle stageStyle;
     }
 
-    private static BrowserConfig browserConfig;
+    @Setter
+    private BrowserConfig browserConfig;
 
-    public static void run(BrowserConfig browserConfig, String[] args) {
-        BrowserApplication.browserConfig = browserConfig;
-        Application.launch(BrowserApplication.class, args);
 
+    public BrowserApplication() {
     }
 
     public static double getScreenWidth() {
@@ -78,12 +81,6 @@ public class BrowserApplication extends Application {
 
     @Override
     public void start(Stage primaryStage) {
-        /*
-        List<String> fontFamilies = Font.getFamilies();
-        for (String fontFamily: fontFamilies) {
-            Font.font(fontFamily);
-        }
-         */
         primaryStage.setWidth(browserConfig.getWidth() == null ? BrowserApplication.getScreenWidth() * 0.8 : browserConfig.getWidth());
         primaryStage.setHeight(browserConfig.getHeight() == null ? BrowserApplication.geScreenHeight() * 0.8 : browserConfig.getHeight());
         primaryStage.setMinWidth(browserConfig.getMinWidth());
@@ -104,7 +101,7 @@ public class BrowserApplication extends Application {
             primaryStage.setOnCloseRequest(browserConfig.getOnWindowClose());
         }
 
-        MyBrowser myBrowser = new MyBrowser(browserConfig);
+        this.myBrowser = new MyBrowser(browserConfig);
         Scene scene = new Scene(myBrowser);
 
         // 第三方样式库
@@ -114,6 +111,10 @@ public class BrowserApplication extends Application {
 
         primaryStage.setScene(scene);
         primaryStage.show();
+    }
+
+    public void load() {
+        this.myBrowser.load();
     }
 
 }
@@ -126,12 +127,16 @@ class MyBrowser extends StackPane {
         WebConsoleListener.setDefaultListener(MyBrowser::onConsolePrint);
     }
 
+    private final BrowserConfig browserConfig;
+    private final WebView webView;
+
     private static void onConsolePrint(WebView webView, String message, int lineNumber, String sourceId) {
         log.info("Browser Console: [" + sourceId + ":" + lineNumber + "] " + message);
     }
 
     MyBrowser(BrowserConfig browserConfig) {
-        WebView webView = new WebView();
+        this.browserConfig = browserConfig;
+        this.webView = new WebView();
         WebEngine webEngine = webView.getEngine();
 
         webView.addEventHandler(WebEvent.ANY, e -> {
@@ -144,9 +149,12 @@ class MyBrowser extends StackPane {
 
 
         webView.setContextMenuEnabled(true);
-        log.info("加载url：" + browserConfig.getInitUrl());
-        webEngine.load(browserConfig.getInitUrl());
         getChildren().add(webView);
-
     }
+
+    void load() {
+        log.info("加载url：" + browserConfig.getInitUrl());
+        webView.getEngine().load(this.browserConfig.getInitUrl());
+    }
+
 }
