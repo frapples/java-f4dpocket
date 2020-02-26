@@ -210,6 +210,12 @@
      <version>${mysql.jdbc.version}</version>
      </dependency>
 
+     <!-- javafx皮肤 -->
+     <dependency>
+       <groupId>org.jfxtras</groupId>
+       <artifactId>jmetro</artifactId>
+       <version>8.6.5</version>
+     </dependency>
    </dependencies>
 
   <repositories>

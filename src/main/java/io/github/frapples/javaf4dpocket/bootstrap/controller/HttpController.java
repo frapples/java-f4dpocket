@@ -18,7 +18,6 @@ import javax.servlet.ServletOutputStream;
 import lombok.SneakyThrows;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.StringUtils;
 import spark.Request;
 import spark.Response;
 import spark.Spark;
@@ -66,7 +65,7 @@ public class HttpController extends BaseController {
 
     @SneakyThrows
     private InputStream readStaticFile(String path) {
-        final boolean DEBUG = true;
+        final boolean DEBUG = false;
         if (DEBUG) {
             String resourceDir = "E:\\project\\java-f4dpocket\\src\\main\\resources";
             return new FileInputStream(new File(resourceDir + path));

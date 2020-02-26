@@ -3,6 +3,7 @@ package io.github.frapples.javaf4dpocket.bootstrap;
 import com.google.inject.Guice;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
+import com.google.inject.Key;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 import io.github.frapples.javaf4dpocket.comm.base.BaseController;
@@ -20,7 +21,7 @@ public class Application {
     @Inject
     private Set<BaseController> controllers;
 
-    @Named("server.port")
+    @Named("server.default-port")
     @Inject
     private int port;
 
@@ -30,15 +31,22 @@ public class Application {
         return injector.getInstance(clazz);
     }
 
-    public static void main(String[] args) {
+    public static void run(Integer port) {
         injector = Guice.createInjector(
             new ComponentScanModule("io.github.frapples", Singleton.class, javax.inject.Singleton.class),
             new ConfigureFileModule());
         Application application = injector.getInstance(Application.class);
-        application.start();
+        application.start(port);
     }
 
-    private void start() {
+    public static void main(String[] args) {
+        run(null);
+    }
+
+    private void start(Integer port) {
+        if (port == null) {
+            port = this.port;
+        }
         Spark.port(port);
         controllers.forEach(BaseController::bind);
     }
