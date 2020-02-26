@@ -4,6 +4,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import io.github.frapples.javaf4dpocket.bootstrap.SimpleRemoteLibraryCacheService;
+import io.github.frapples.javaf4dpocket.bootstrap.SimpleRemoteLibraryCacheService.CDNResource;
 import io.github.frapples.javaf4dpocket.comm.base.BaseController;
 import io.github.frapples.javaf4dpocket.comm.base.BaseService;
 import io.github.frapples.javaf4dpocket.comm.utils.JacksonUtils;
@@ -36,6 +38,8 @@ public class HttpController extends BaseController {
     @Inject
     private Set<BaseService> services;
 
+    private SimpleRemoteLibraryCacheService simpleRemoteLibraryCacheService = new SimpleRemoteLibraryCacheService("./library-cache");
+
     @Override
     public void bind() {
         Spark.post("/api/json-rpc", this::jsonRpc);
@@ -46,6 +50,9 @@ public class HttpController extends BaseController {
             response.redirect("/html/main.html");
             return "";
         });
+
+        Spark.get("cache", this::cacheLibrary);
+        Spark.get("cache/*", this::cacheLibraryForCssFont);
     }
 
     private Object jsonRpc(Request request, Response response) throws InterruptedException {
@@ -60,6 +67,25 @@ public class HttpController extends BaseController {
             ServletOutputStream o = response.raw().getOutputStream();
             IOUtils.copy(in, o);
         }
+        return "";
+    }
+
+    private Object cacheLibrary(Request request, Response response) throws IOException {
+        String url = request.queryParams("url");
+        CDNResource cdnResource = simpleRemoteLibraryCacheService.get(url);
+        InputStream in = cdnResource.getInputStream();
+        ServletOutputStream o = response.raw().getOutputStream();
+        IOUtils.copy(in, o);
+        return "";
+    }
+
+    private Object cacheLibraryForCssFont(Request request, Response response) throws IOException {
+        String s = request.url().substring("/cdn/".length());
+        String url= "https://" + s;
+        CDNResource cdnResource = simpleRemoteLibraryCacheService.get(url);
+        InputStream in = cdnResource.getInputStream();
+        ServletOutputStream o = response.raw().getOutputStream();
+        IOUtils.copy(in, o);
         return "";
     }
 
