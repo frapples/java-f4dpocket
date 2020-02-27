@@ -1,11 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
+
     <!-- 日志文件路径 -->
-    <springProperty scope="context" name="logPath" source="logging.path"/>
+    <!--
+      <springProperty scope="context" name="logPath" source="logging.path"/>
+      -->
     <!-- 应用名称 -->
+    <!--
     <springProperty scope="context" name="appCapitalName" source="spring.application.capitalname"/>
+      -->
     <!-- 多环境 -->
+    <!--
     <springProperty scope="context" name="scope" source="spring.profiles.active"/>
+    -->
+
+    <property resource="application.properties" />
+    <property scope="context" name="logPath" value="${logging.path}" />
+    <property scope="context" name="appCapitalName" value="${application.name}" />
+    <property scope="context" name="scope" value="${profiles.active}" />
 
     <appender name="stdOut" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
@@ -27,7 +39,7 @@
 
     <root level="INFO">
         <appender-ref ref="stdOut"/>
-      <!-- <appender-ref ref="fileAppender"/> -->
+        <appender-ref ref="fileAppender"/>
     </root>
 
 </configuration>
