@@ -1,7 +1,6 @@
-package io.github.frapples.javaf4dpocket.comm.utils;
+package io.github.frapples.javaf4dpocket.comm.utils.javafx;
 
 import com.sun.javafx.webkit.WebConsoleListener;
-import io.github.frapples.javaf4dpocket.comm.utils.BrowserApplication.BrowserConfig;
 import javafx.application.Application;
 import javafx.event.EventHandler;
 import javafx.geometry.Rectangle2D;
@@ -18,7 +17,6 @@ import javafx.stage.WindowEvent;
 import jfxtras.styles.jmetro.JMetro;
 import jfxtras.styles.jmetro.Style;
 import lombok.Data;
-import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
@@ -30,7 +28,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class BrowserApplication extends Application {
 
-    private MyBrowser myBrowser;
+    private BrowserView browserView;
 
     @Data
     @Accessors(chain = true)
@@ -92,69 +90,58 @@ public class BrowserApplication extends Application {
         if (browserConfig.getIcon() != null) {
             primaryStage.getIcons().add(browserConfig.getIcon());
         }
-
         if (browserConfig.getStageStyle() != null) {
             primaryStage.initStyle(browserConfig.getStageStyle());
         }
-
         if (browserConfig.getOnWindowClose() != null) {
             primaryStage.setOnCloseRequest(browserConfig.getOnWindowClose());
         }
 
-        this.myBrowser = new MyBrowser(browserConfig);
-        Scene scene = new Scene(myBrowser);
-
+        this.browserView = new BrowserView(browserConfig);
+        Scene scene = new Scene(browserView);
         // 第三方样式库
         JMetro jMetro = new JMetro(Style.LIGHT);
         jMetro.setScene(scene);
-
-
         primaryStage.setScene(scene);
         primaryStage.show();
     }
 
     public void load() {
-        this.myBrowser.load();
+        this.browserView.load();
     }
 
+    @Slf4j
+    static class BrowserView extends StackPane {
+
+        private final BrowserConfig browserConfig;
+        private final WebView webView;
+
+        BrowserView(BrowserConfig browserConfig) {
+            this.browserConfig = browserConfig;
+            this.webView = new WebView();
+            WebEngine webEngine = webView.getEngine();
+
+            JavaFxUtils.getWebConsoleLogEvent().addListener((WebView webView, String message, int lineNumber, String sourceId) -> {
+                if (webView == this.webView) {
+                    log.info("Browser Console: [" + sourceId + ":" + lineNumber + "] " + message);
+                }
+            });
+            webView.addEventHandler(WebEvent.ANY, e -> {
+                log.error("{}", e.getData());
+            });
+            webEngine.setOnError(event -> log.error(event.getMessage()));
+            webEngine.getLoadWorker().exceptionProperty().addListener(
+                (ov, t, t1) -> log.info("Received exception: {}, {}", t, t1));
+
+            webView.setContextMenuEnabled(true);
+            getChildren().add(webView);
+        }
+
+        void load() {
+            log.info("加载url：" + browserConfig.getInitUrl());
+            webView.getEngine().load(this.browserConfig.getInitUrl());
+        }
+
+    }
 }
 
-@Slf4j
-class MyBrowser extends StackPane {
-
-    static {
-        // 要注意的是，Listener如果有别人调用这个函数，将会被覆盖
-        WebConsoleListener.setDefaultListener(MyBrowser::onConsolePrint);
-    }
-
-    private final BrowserConfig browserConfig;
-    private final WebView webView;
-
-    private static void onConsolePrint(WebView webView, String message, int lineNumber, String sourceId) {
-        log.info("Browser Console: [" + sourceId + ":" + lineNumber + "] " + message);
-    }
-
-    MyBrowser(BrowserConfig browserConfig) {
-        this.browserConfig = browserConfig;
-        this.webView = new WebView();
-        WebEngine webEngine = webView.getEngine();
-
-        webView.addEventHandler(WebEvent.ANY, e -> {
-            log.error("{}", e.getData());
-        });
-
-        webEngine.setOnError(event -> log.error(event.getMessage()));
-        webEngine.getLoadWorker().exceptionProperty().addListener(
-            (ov, t, t1) -> log.info("Received exception: {}, {}", t, t1));
-
-
-        webView.setContextMenuEnabled(true);
-        getChildren().add(webView);
-    }
-
-    void load() {
-        log.info("加载url：" + browserConfig.getInitUrl());
-        webView.getEngine().load(this.browserConfig.getInitUrl());
-    }
-
-}

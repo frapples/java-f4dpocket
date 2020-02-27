@@ -1,6 +1,6 @@
 package io.github.frapples.javaf4dpocket.bootstrap;
 
-import io.github.frapples.javaf4dpocket.comm.utils.BrowserApplication;
+import io.github.frapples.javaf4dpocket.comm.utils.javafx.BrowserApplication;
 import io.github.frapples.javaf4dpocket.comm.utils.NetUtils;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
