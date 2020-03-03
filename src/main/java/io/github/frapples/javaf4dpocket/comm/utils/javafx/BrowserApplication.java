@@ -103,7 +103,6 @@ public class BrowserApplication extends Application {
         JMetro jMetro = new JMetro(Style.LIGHT);
         jMetro.setScene(scene);
         primaryStage.setScene(scene);
-        primaryStage.show();
     }
 
     public void load() {
