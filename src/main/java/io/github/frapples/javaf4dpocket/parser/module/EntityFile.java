@@ -43,6 +43,10 @@ public class EntityFile implements IGeneratedFile<Void> {
     public Map<String, Object> prepare(ModuleEntity module, Void customConfig) {
         String className = module.getModuleName() + "Entity";
         ModuleConfigEntity config = module.getModules().get("entity");
+        if (config == null) {
+            return null;
+        }
+
         DatabaseConfig dbConfig = module.getProject().getProjectConfig().getDatabase();
         List<ProjectColumnEntity> fields = entityFields(dbConfig, module.getTable().getTableName());
         boolean importBigDecimal = fields.stream().map(ProjectColumnEntity::getJavaType).anyMatch(Predicate.isEqual("BigDecimal"));

@@ -19,18 +19,25 @@ import io.github.frapples.javaf4dpocket.parser.model.ProjectColumnEntity;
 import java.io.File;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.StringReader;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Supplier;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import lombok.Data;
+import lombok.Lombok;
 import lombok.SneakyThrows;
 import lombok.experimental.Accessors;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.jooq.lambda.Seq;
+import org.jooq.lambda.fi.util.function.CheckedBiConsumer;
+import org.jooq.lambda.function.Consumer2;
+import org.jooq.lambda.function.Consumer3;
+import org.jooq.lambda.tuple.Tuple;
 import org.jooq.lambda.tuple.Tuple2;
 
 /**
@@ -74,19 +81,42 @@ public class MapperXmlFile implements IGeneratedFile<MapperCustomEntity> {
             FileUtils.writeStringToFile(file, content, Charsets.UTF_8);
         } else {
             List<String> lines = FileUtils.readLines(file, Charsets.UTF_8);
-            String splitter = "************************* 以上代码重新生成后会被替换，不允许修改 *************************";
-            long splitLineNo = Seq.seq(lines).zipWithIndex()
-                .filter(((tuple) -> tuple.v1.contains(splitter))).map(Tuple2::v2).findFirst()
-                .orElseThrow(() -> ErrcodeException.error("错误"));
+            List<String> dstLines = IOUtils.readLines(new StringReader(content));
+            Tuple2<Integer, Integer> srcMark = extractAutomaticallyGeneratedFragments(lines);
+            Tuple2<Integer, Integer> dstMark = extractAutomaticallyGeneratedFragments(dstLines);
+
+            Consumer3<OutputStream, List<String>, Boolean> writeHelper = ((out, list, isEnd) -> {
+                try {
+                    if (!list.isEmpty()) {
+                        String context = String.join(System.lineSeparator(), list);
+                        IOUtils.write(context, out, Charsets.UTF_8);
+                        if (!isEnd) {
+                            IOUtils.write(System.lineSeparator(), out, Charsets.UTF_8);
+                        }
+                    }
+                } catch (Exception e) {
+                    throw Lombok.sneakyThrow(e);
+                }
+            });
 
             try (OutputStream out = FileUtils.openOutputStream(file)) {
-                IOUtils.write(content, out, Charsets.UTF_8);
-                String endContext = String.join(System.lineSeparator(), lines.subList((int) (splitLineNo + 1), lines.size()));
-                IOUtils.write(endContext, out, Charsets.UTF_8);
+                writeHelper.accept(out, lines.subList(0, srcMark.v1), false);
+                writeHelper.accept(out, dstLines.subList(dstMark.v1, dstMark.v2), false);
+                writeHelper.accept(out, lines.subList(srcMark.v2, lines.size()), true);
             }
         }
 
         return Collections.singletonList(file.getCanonicalPath());
+    }
+
+    @SneakyThrows
+    private Tuple2<Integer, Integer> extractAutomaticallyGeneratedFragments(List<String> lines) {
+        String splitter = "************************* 以上代码重新生成后会被替换，不允许修改 *************************";
+        int splitLineNo = (int) (Seq.seq(lines).zipWithIndex()
+                    .filter(((tuple) -> tuple.v1.contains(splitter))).map(Tuple2::v2).findFirst()
+                    .orElseThrow(() -> ErrcodeException.error("错误"))
+                    + 1);
+        return Tuple.tuple(0, splitLineNo + 1);
     }
 
     @Data

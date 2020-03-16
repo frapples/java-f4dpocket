@@ -55,6 +55,8 @@ public class WebProjectGenerator {
             .put("comment", moduleEntity.getTable().getTableComment())
             .put("author", moduleEntity.authorComment())
             .put("date", DateFormatUtils.format(new Date(), "yyyy-MM-dd"));
+
+        List<IGeneratedFile> matches = new ArrayList<>();
         for (IGeneratedFile generatedFile : getGeneratedFiles()) {
 
             Object customConfig = null;
@@ -62,11 +64,14 @@ public class WebProjectGenerator {
                 customConfig = new MapperCustomEntity();
             }
             Map<String, Object> m = generatedFile.prepare(moduleEntity, customConfig);
-            modelBuilder.putAll(m);
+            if (m != null) {
+                modelBuilder.putAll(m);
+                matches.add(generatedFile);
+            }
         }
         Map<String, Object> model = modelBuilder.build();
 
-        for (IGeneratedFile<?> generatedFile : getGeneratedFiles()) {
+        for (IGeneratedFile<?> generatedFile : matches) {
             generatedFile.generate(moduleEntity, null, model);
         }
     }

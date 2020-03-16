@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 import javax.inject.Inject;
+import javax.inject.Singleton;
 import lombok.Data;
 import org.apache.commons.io.FileUtils;
 
@@ -26,6 +27,7 @@ import org.apache.commons.io.FileUtils;
  * @author Frapples <isfrapples@outlook.com>
  * @date 2019/9/26
  */
+@Singleton
 public class ProjectService extends BaseService {
 
     private final String CONFIG_FILE_NAME = "f4dpocket-project.json";
